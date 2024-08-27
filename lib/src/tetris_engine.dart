@@ -229,13 +229,6 @@ class TetrisEngine {
     bag.shuffle();
   }
 
-  void setGameOver({String reason = ""}) {
-    if (reason.isNotEmpty) {
-      print("GAME OVER, reason: $reason");
-    }
-    isGameOver = true;
-  }
-
   void tick() {
     if (isGameOver) return;
     if (currentPiece == null) return;
@@ -251,7 +244,7 @@ class TetrisEngine {
 
       if (!isValidMove(
           currentPiece!['x'], currentPiece!['y'], currentPiece!['rotation'])) {
-        setGameOver(reason: "(tick) can't spawn new piece");
+        isGameOver = true;
       }
     }
 
@@ -273,7 +266,7 @@ class TetrisEngine {
       generateNextPiece();
       if (!isValidMove(
           currentPiece!['x'], currentPiece!['y'], currentPiece!['rotation'])) {
-        setGameOver(reason: "(movePiece) can't move");
+        isGameOver = true;
       }
     } else if (move == "down") {
       if (isValidMove(currentPiece!['x'], currentPiece!['y'] + 1,

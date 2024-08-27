@@ -25,13 +25,29 @@ class TetrisScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Stack(
-        children: [
-          TetrisGrid(),
-          TetrisControls(),
-          TetrisModal(),
-        ],
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        if (details.velocity.pixelsPerSecond.dx > 0) {
+          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveRight());
+        } else if (details.velocity.pixelsPerSecond.dx < 0) {
+          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveLeft());
+        }
+      },
+      onVerticalDragEnd: (details) {
+        if (details.velocity.pixelsPerSecond.dy > 0) {
+          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveDown());
+        } else if (details.velocity.pixelsPerSecond.dy < 0) {
+          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveUp());
+        }
+      },
+      child: const Scaffold(
+        body: Stack(
+          children: [
+            TetrisGrid(),
+            TetrisControls(),
+            TetrisModal(),
+          ],
+        ),
       ),
     );
   }
@@ -52,6 +68,7 @@ class TetrisGrid extends StatelessWidget {
 
         if (state is TetrisInProgress) {
           return GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 10,
               childAspectRatio: 1.0,
@@ -105,41 +122,28 @@ class TetrisControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanUpdate: (details) {
-        if (details.delta.dy > 0) {
-          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveDown());
-        } else if (details.delta.dy < 0) {
-          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveUp());
-        } else if (details.delta.dx > 0) {
-          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveRight());
-        } else if (details.delta.dx < 0) {
-          BlocProvider.of<TetrisBloc>(context).add(TetrisMoveLeft());
-        }
-      },
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  BlocProvider.of<TetrisBloc>(context)
-                      .add(TetrisRotateCounterClockwise());
-                },
-                child: const Icon(Icons.rotate_left),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  BlocProvider.of<TetrisBloc>(context)
-                      .add(TetrisRotateClockwise());
-                },
-                child: const Icon(Icons.rotate_right),
-              ),
-            ],
-          ),
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                BlocProvider.of<TetrisBloc>(context)
+                    .add(TetrisRotateCounterClockwise());
+              },
+              child: const Icon(Icons.rotate_left),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                BlocProvider.of<TetrisBloc>(context)
+                    .add(TetrisRotateClockwise());
+              },
+              child: const Icon(Icons.rotate_right),
+            ),
+          ],
         ),
       ),
     );
