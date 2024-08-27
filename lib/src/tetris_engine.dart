@@ -230,12 +230,19 @@ class TetrisEngine {
   }
 
   void setGameOver({String reason = ""}) {
+    if (reason.isNotEmpty) {
+      print("GAME OVER, reason: $reason");
+    }
     isGameOver = true;
   }
 
   void tick() {
     if (isGameOver) return;
     if (currentPiece == null) return;
+
+    final isValid = isValidMove(
+        currentPiece!['x'], currentPiece!['y'] + 1, currentPiece!['rotation']);
+    // print("tick: $isValid");
 
     if (isValidMove(currentPiece!['x'], currentPiece!['y'] + 1,
         currentPiece!['rotation'])) {
@@ -248,7 +255,7 @@ class TetrisEngine {
 
       if (!isValidMove(
           currentPiece!['x'], currentPiece!['y'], currentPiece!['rotation'])) {
-        isGameOver = true;
+        setGameOver(reason: "(tick) can't spawn new piece");
       }
     }
 
@@ -270,7 +277,7 @@ class TetrisEngine {
       generateNextPiece();
       if (!isValidMove(
           currentPiece!['x'], currentPiece!['y'], currentPiece!['rotation'])) {
-        isGameOver = true;
+        setGameOver(reason: "(movePiece) can't move");
       }
     } else if (move == "down") {
       if (isValidMove(currentPiece!['x'], currentPiece!['y'] + 1,
@@ -303,18 +310,21 @@ class TetrisEngine {
   void rotateCounterClockwise() => rotatePiece(-1);
 
   bool isValidMove(int x, int y, int rotation) {
-    List<List<int>> piece = getPieceShape(currentPiece!['type'], rotation);
+    final piece = getPieceShape(currentPiece!['type'], rotation);
 
     for (int row = 0; row < piece.length; row++) {
       for (int col = 0; col < piece[row].length; col++) {
         if (piece[row][col] == 1) {
-          int newX = x + col;
-          int newY = y + row;
+          final newX = x + col;
+          final newY = y + row;
 
-          if (newX < 0 ||
-              newX >= width ||
-              newY >= height ||
-              (newY >= 0 && grid[newY][newX] != 0)) {
+          // Check if out of bounds
+          if (newX < 0 || newX >= width || newY >= height) {
+            return false;
+          }
+
+          // Check if overlapping existing blocks (non-zero and not the current piece in play)
+          if (newY >= 0 && grid[newY][newX] != 0 && grid[newY][newX] != 1) {
             return false;
           }
         }
