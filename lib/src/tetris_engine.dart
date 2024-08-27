@@ -167,7 +167,7 @@ class TetrisEngine {
   final List<int> scores = [0, 100, 300, 500, 800];
   late int width;
   late int height;
-  late List<List<int>> grid;
+  late List<List<dynamic>> grid;
   Map<String, dynamic>? currentPiece;
   Map<String, dynamic>? nextPiece;
   List<String> bag = [];
@@ -239,10 +239,6 @@ class TetrisEngine {
   void tick() {
     if (isGameOver) return;
     if (currentPiece == null) return;
-
-    final isValid = isValidMove(
-        currentPiece!['x'], currentPiece!['y'] + 1, currentPiece!['rotation']);
-    // print("tick: $isValid");
 
     if (isValidMove(currentPiece!['x'], currentPiece!['y'] + 1,
         currentPiece!['rotation'])) {
@@ -335,17 +331,20 @@ class TetrisEngine {
   }
 
   void lockPiece() {
-    List<List<int>> piece =
+    final piece =
         getPieceShape(currentPiece!['type'], currentPiece!['rotation']);
 
     for (int row = 0; row < piece.length; row++) {
       for (int col = 0; col < piece[row].length; col++) {
-        if (piece[row][col] == 1) {
-          int x = currentPiece!['x'] + col;
-          int y = currentPiece!['y'] + row;
+        if (piece[row][col] != 0) {
+          final x = currentPiece!['x'] + col;
+          final y = currentPiece!['y'] + row;
 
           if (y >= 0) {
-            grid[y][x] = currentPiece!['type'].codeUnitAt(0);
+            // Ensure it's within the grid
+
+            grid[y][x] =
+                currentPiece!['type']; // Mark the cell with the piece type
           }
         }
       }
@@ -544,7 +543,7 @@ class TetrisEngine {
   }
 
   void updateGrid() {
-    List<List<int>> newGrid =
+    List<List<dynamic>> newGrid =
         List.generate(height, (_) => List.filled(width, 0));
 
     for (int row = 0; row < height; row++) {

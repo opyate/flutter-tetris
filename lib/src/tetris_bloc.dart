@@ -96,7 +96,7 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
 
   void _startGameLoop() async {
     while (_engine.isGameOver == false) {
-      await Future.delayed(const Duration(milliseconds: 2000));
+      await Future.delayed(const Duration(milliseconds: 1000));
       add(TetrisTick());
     }
   }
