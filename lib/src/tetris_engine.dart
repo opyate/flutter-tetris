@@ -345,23 +345,23 @@ class TetrisEngine {
   }
 
   void clearLines() {
-    int linesCleared = 0;
+    final fullRowIndices = <int>[];
 
     for (int row = height - 1; row >= 0; row--) {
       if (grid[row].every((cell) => cell != 0)) {
-        linesCleared++;
+        fullRowIndices.add(row);
       }
     }
 
-    if (linesCleared == 0) return;
+    if (fullRowIndices.isEmpty) return;
 
-    for (int i = 0; i < linesCleared; i++) {
-      grid.removeLast();
+    for (final rowIndex in fullRowIndices) {
+      grid.removeAt(rowIndex);
       grid.insert(0, List.filled(width, 0));
     }
 
-    int addToScore = scores[linesCleared];
-    score += addToScore;
+    final scoreForCurrentTick = scores[fullRowIndices.length];
+    score += scoreForCurrentTick;
   }
 
   List<List<int>> getPieceShape(String type, int rotation) {
